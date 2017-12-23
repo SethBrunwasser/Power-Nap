@@ -4,7 +4,7 @@ import win32con
 import ctypes
 
 
-# Works with Windows/Linux/MacOS
+# Works with Windows
 def turnoff():
 	# Shuts off display
 	SC_MONITORPOWER = 0xF170
@@ -19,7 +19,3 @@ def turnon():
 	mouse_event = ctypes.windll.user32.mouse_event
 	MOUSEEVENTF_MOVE = 0x0001
 	mouse_event(MOUSEEVENTF_MOVE, 0, 0, 0, 0)
-
-turnoff()
-time.sleep(3)
-turnon()

@@ -1,14 +1,7 @@
 import cv2
 import sys
 
-# Creating face cascade
-cascPath = "haarcascade_frontalface_default.xml"
-faceCascade = cv2.CascadeClassifier(cascPath)
-
-# Set source to default webcam
-video_capture = cv2.VideoCapture(0)
-
-while True:
+def faces(video_capture, faceCascade):
 	# Capture frame
 	ret, frame = video_capture.read()
 
@@ -22,16 +15,4 @@ while True:
 		flags = cv2.CASCADE_SCALE_IMAGE
 	)
 
-	# Draw rectangle on faces
-	for (x, y, w, h) in faces:
-		cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-	# Display frame
-	cv2.imshow('Video', frame)
-
-	if cv2.waitKey(1) & 0xFF == ord('q'):
-		break
-
-# Release capture
-video_capture.release()
-cv2.destroyAllWindows()
+	return faces, ret, frame
