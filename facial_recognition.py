@@ -1,7 +1,7 @@
 import cv2
 import sys
 
-def faces(video_capture, faceCascade):
+def detect_faces(video_capture, faceCascade):
 	# Capture frame
 	ret, frame = video_capture.read()
 

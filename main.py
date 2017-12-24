@@ -2,7 +2,7 @@
 # If a face is found, then the monitor will wake.
 import cv2
 import sys
-from facial_recognition import faces
+from facial_recognition import detect_faces
 from screen import turnoff, turnon
 
 if "__main__" == __name__:
@@ -16,7 +16,7 @@ if "__main__" == __name__:
 	# Save last 100 faces
 	faceHistory = 0
 	while True:
-		faces, ret, frame = faces(video_capture=video_capture, faceCascade=faceCascade)
+		faces, ret, frame = detect_faces(video_capture=video_capture, faceCascade=faceCascade)
 
 		# Draw a rectangle around the faces
 		for (x, y, w, h) in faces:
@@ -29,10 +29,8 @@ if "__main__" == __name__:
 			break
 
 		# Turn off display if no faces found
-		if not faces:
-			faceHistory += 1
-			if faceHistory == 100:
-				turnoff()
+		if len(faces) == 0:
+			turnoff()
 		else:
 			turnon()
 
