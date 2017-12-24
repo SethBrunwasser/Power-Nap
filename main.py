@@ -1,5 +1,8 @@
 # If no faces are found, then the display will sleep.
 # If a face is found, then the monitor will wake.
+
+# Press Q to exit
+
 import cv2
 import sys
 from facial_recognition import detect_faces
