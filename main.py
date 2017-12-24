@@ -14,7 +14,7 @@ if "__main__" == __name__:
 	video_capture = cv2.VideoCapture(0)
 
 	# Save last 100 faces
-	faceHistory = 0
+	faceHistory = []
 	while True:
 		faces, ret, frame = detect_faces(video_capture=video_capture, faceCascade=faceCascade)
 
@@ -28,10 +28,16 @@ if "__main__" == __name__:
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
-		# Turn off display if no faces found
+		# Turn off display if no faces found with a 5 frame requirement
 		if len(faces) == 0:
-			turnoff()
+			faceHistory.append("off")
+			if all(face == 'off' for face in faceHistory) and len(faceHistory) == 5:
+				turnoff()
+				faceHistory = []
 		else:
+			faceHistory.append("on")
+			#if all(face == 'on' for face in faceHistory) and len(faceHistory) == 5:
 			turnon()
+			faceHistory = []
 
 	print("Exited.")
