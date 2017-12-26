@@ -4,8 +4,10 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
@@ -19,19 +21,18 @@ from facial_recognition import detect_faces
 from screen import turnoff, turnon
 
 
-
 class PowerNapApp(App):
+
+	faceHistory = []
 
 	def build(self):
 		self.img1 = Image(source='images/1.jpg')
 		layout = BoxLayout(orientation='vertical', spacing=0)
 		layout.add_widget(videoPanelWidget(self.img1))
-		btn1 = Button(text='Hello')
 
-		options = BoxLayout(orientation='vertical')
-		options.add_widget(Button(text='Hello'))
-		options.add_widget(Button(text='Hello'))
-		options.add_widget(Button(text='Hello'))
+		options = StackLayout(orientation='tb-lr')
+		options.add_widget(optionsPanelWidget())
+
 		layout.add_widget(options)
 		
 		#opencv2 stuffs
@@ -80,6 +81,18 @@ class PowerNapApp(App):
 		for (x, y, w, h) in faces:
 			cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+		# Turn off display if no faces found with a 5 frame requirement
+		if len(faces) == 0:
+			self.faceHistory.append("off")
+			if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 5:
+				turnoff()
+				self.faceHistory = []
+		else:
+			self.faceHistory.append("on")
+			#if all(face == 'on' for face in faceHistory) and len(faceHistory) == 5:
+			turnon()
+			self.faceHistory = []
+
 		# Display the resulting frame
 		#cv2.imshow("CV2 Image", frame)
 
@@ -114,6 +127,20 @@ class videoPanelWidget(Widget):
 		self.rect.pos = self.pos
 		self.rect.size = self.size
 
+class optionsPanelWidget(Widget):
+	def __init__(self, **kwargs):
+		super(optionsPanelWidget, self).__init__(**kwargs)
+		self.add_widget(Label(text="Option 1", font_size='15sp', font_name='RobotoMono-Regular'))
+		self.add_widget(TextInput(text='Option 1 input', font_size='15sp', font_name='RobotoMono-Regular', multiline=False))
+		with self.canvas.before:
+			Color(0, 0.4, 1, mode='rgb')
+			self.rect = Rectangle(pos=self.pos, size=self.size)
+		self.bind(pos=self.update_rect)
+		self.bind(size=self.update_rect)
+	
+	def update_rect(self, *args):
+		self.rect.pos = self.pos
+		self.rect.size = self.size
 
 if __name__ == '__main__':
 	PowerNapApp().run()
