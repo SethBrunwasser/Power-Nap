@@ -83,18 +83,22 @@ class PowerNapApp(App):
 		# Draw a rectangle around the faces
 		for face_no, (x, y, w, h) in enumerate(faces):
 			cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-			cv2.putText(frame, str(face_no), (x, y - 30), cv2.FONT_HERSHEY_TRIPLEX, .7, (0, 0, 0), 1, cv2.LINE_AA)
+			cv2.putText(frame, str(face_no), (x, y - 15), cv2.FONT_HERSHEY_TRIPLEX, 2, (255, 255, 255), 1, cv2.LINE_AA)
 
 		# Turn off display if no faces found with a 5 frame requirement
 		if len(faces) == 0:
 			self.faceHistory.append("off")
-			if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 5:
+			if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 3:
+				turnoff()
+				self.faceHistory = []
+		# Turn off display if more than one face found with a 5 frame requirement
+		elif len(faces) > 1:
+			self.faceHistory.append("off")
+			if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 3:
 				turnoff()
 				self.faceHistory = []
 		else:
 			self.faceHistory.append("on")
-			#if all(face == 'on' for face in faceHistory) and len(faceHistory) == 5:
 			turnon()
 			self.faceHistory = []
 
