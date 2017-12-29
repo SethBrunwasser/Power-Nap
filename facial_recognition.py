@@ -1,5 +1,6 @@
 import cv2
-import sys
+import os
+import numpy as np
 
 def detect_faces(video_capture, faceCascade):
 	# Capture frame
@@ -16,3 +17,15 @@ def detect_faces(video_capture, faceCascade):
 	)
 
 	return faces, ret, frame
+
+
+
+def add_face(label, numOfImages):
+	# Add new face to face recognition collection
+	if not os.path.isdir("training-data/" + label):
+		os.makedirs("training-data/" + label)
+		os.chdir("training-data/" + label)
+		cam = cv2.VideoCapture(0)
+		for i in range(numOfImages):
+			s, img = cam.read()
+			imwrite(label+i+".jpg", img)

@@ -91,12 +91,12 @@ class PowerNapApp(App):
 			if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 3:
 				turnoff()
 				self.faceHistory = []
-		# Turn off display if more than one face found with a 5 frame requirement
-		elif len(faces) > 1:
-			self.faceHistory.append("off")
-			if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 3:
-				turnoff()
-				self.faceHistory = []
+		# Turn off display if more than one face found with a 3 frame requirement
+		#elif len(faces) > 1:
+		#	self.faceHistory.append("off")
+		#	if all(face == 'off' for face in self.faceHistory) and len(self.faceHistory) == 3:
+		#		turnoff()
+		#		self.faceHistory = []
 		else:
 			self.faceHistory.append("on")
 			turnon()
@@ -140,7 +140,7 @@ class optionsPanelWidget(Widget):
 	def __init__(self, **kwargs):
 		super(optionsPanelWidget, self).__init__(**kwargs)
 		self.add_widget(Label(text="Option 1", font_size='15sp', font_name='RobotoMono-Regular'))
-		self.add_widget(TextInput(text='Option 1 input', font_size='15sp', font_name='RobotoMono-Regular', multiline=False))
+		#self.add_widget(TextInput(text='Option 1 input', font_size='15sp', font_name='RobotoMono-Regular', multiline=False))
 		with self.canvas.before:
 			Color(0, 0.4, 1, mode='rgb')
 			self.rect = Rectangle(pos=self.pos, size=self.size)
