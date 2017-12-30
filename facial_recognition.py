@@ -35,17 +35,17 @@ def detect_faces(img):
 	faces = face_cascade.detectMultiScale(gray, scaleFactor=1.2, minNeighbors=5);
 	 
 	#if no faces are detected then return original img
-	#if len(faces) == 0:
-	#	return None, None
+	if len(faces) == 0:
+		return None, None
 	 
 	#under the assumption that there will be only one face for training images,
 	#extract the face area
-	if len(faces) == 1:
+	elif len(faces) == 1:
 		(x, y, w, h) = faces[0]
-		return gray[y:y+w, x:x+h], faces[0]
+		return [gray[y:y+w, x:x+h]], faces
 	else:
 		#return only the face part of the image
-		return [gray[y:y+w, x:x+h] for (x, y, w, h) in faces], faces
+		return [gray[y:y+w, x:x+h] for x, y, w, h in faces], faces
 
 
 def add_face(label, numOfImages):
@@ -74,13 +74,15 @@ def prepare_training_data(data_folder_path):
 			image = cv2.imread(image_path)
 			cv2.imshow("Training on image..", image)
 			cv2.waitKey(100)
-			face, rect = detect_faces(image)
-			if face is not None:
-				faces.append(face)
-				if label == "Seth":
-					labels.append(1)
-				if label == "Sam":
-					labels.append(2)
+			detected_faces, rect = detect_faces(image)
+			if detected_faces is not None:
+				for face in detected_faces:
+					if face is not None:
+						faces.append(face)
+						if label == "Seth":
+							labels.append(1)
+						if label == "Sam":
+							labels.append(2)
 
 	cv2.destroyAllWindows()
 	cv2.waitKey(1)
@@ -89,14 +91,18 @@ def prepare_training_data(data_folder_path):
 
 #add_face("Sam", 16)
 faces, labels = prepare_training_data("training-data")
+
 print("Total faces: ", len(faces))
 print("Total labels: ", len(labels))
 
 
-
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 
-face_recognizer.train(np.asarray(faces), np.array(labels))
+
+#npFaces = np.array(faces, dtype=np.int32)
+#cv2.CV_32SC1
+
+face_recognizer.train(faces, np.array(labels))
 
 subjects = {1: "Seth", 2: "Sam"}
 
@@ -104,11 +110,11 @@ def predict(test_img):
 	img = test_img
 
 	faces, rects = detect_faces(img)
+
 	if faces is not None and rects is not None:
-		print(len(faces))
+		
 		for face, rect in zip(faces, rects):
 			if face is not None and rect is not None:
-				print(face)
 				label = face_recognizer.predict(face)
 				label_text = subjects[label[0]] + " - " + str(round(label[1], 1))
 
