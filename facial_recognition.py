@@ -89,22 +89,24 @@ def prepare_training_data(data_folder_path):
 	cv2.destroyAllWindows()
 	return faces, labels
 
+def train_save():
+	faces, labels = prepare_training_data("training-data")
+
+	print("Total faces: ", len(faces))
+	print("Total labels: ", len(labels))
+
+	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+
+	face_recognizer.train(faces, np.array(labels))
+
+	face_recognizer.save('training-data/recognize_model.yml')
+
 #add_face("Sam", 16)
-faces, labels = prepare_training_data("training-data")
-
-print("Total faces: ", len(faces))
-print("Total labels: ", len(labels))
-
-
-face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-
-
-#npFaces = np.array(faces, dtype=np.int32)
-#cv2.CV_32SC1
-
-face_recognizer.train(faces, np.array(labels))
 
 subjects = {1: "Seth", 2: "Sam"}
+train_save()
+face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+face_recognizer.read("training-data/recognize_model.yml")
 
 def predict(test_img):
 	img = test_img
