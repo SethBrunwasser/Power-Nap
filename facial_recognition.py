@@ -2,6 +2,9 @@ import cv2
 import os
 import numpy as np
 import time
+
+
+
 '''
 def detect_faces(video_capture, faceCascade):
 	# Capture frame
@@ -19,6 +22,7 @@ def detect_faces(video_capture, faceCascade):
 
 	return faces, ret, frame
 '''
+
 #function to detect face using OpenCV
 def detect_faces(img):
 	#convert the test image to gray scale as opencv face detector expects gray images
@@ -104,7 +108,7 @@ def train_save():
 #add_face("Sam", 16)
 
 subjects = {1: "Seth", 2: "Sam"}
-train_save()
+
 face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 face_recognizer.read("training-data/recognize_model.yml")
 
