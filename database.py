@@ -22,7 +22,6 @@ class UsersDB:
 		except:
 			self.connection.rollback()
 
-
 	def insert(self, query):
 		try:
 			self.cursor.execute(query)
@@ -37,17 +36,3 @@ class UsersDB:
 
 	def __del__(self):
 		self.connection.close()
-
-	sql = """CREATE TABLE PERSON (
-			USER_ID INT,
-			NAME CHAR(20) NOT NULL,
-			AUTHORIZATION CHAR(1),
-			IMAGE_PATH CHAR(20) )"""
-	try:
-		cursor.execute(sql)
-		db.commit()
-	except:
-		db.rollback()
-
-	sql = "INSERT INTO PERSON VALUES (%"
-	db.close()
