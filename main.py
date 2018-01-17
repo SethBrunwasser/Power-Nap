@@ -16,31 +16,39 @@ if "__main__" == __name__:
 	# Set source to default webcam
 	video_capture = cv2.VideoCapture(0)
 
-	# Save last 100 faces
+	# detected face history
 	faceHistory = []
+
+	counter = 0
+	
 	while True:
-		faces, ret, frame = detect_faces(video_capture=video_capture, faceCascade=faceCascade)
 
-		# Draw a rectangle around the faces
-		for (x, y, w, h) in faces:
-			cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+		ret, frame = video_capture.read()
+		# Only look at every third frame
+		if counter % 3 == 0:
 
+			faces, rect = detect_faces(frame)
 
-		# Display the resulting frame
-		cv2.imshow('frame', frame)
+			# Draw a rectangle around the faces
+			if faces is not None:
+				for (x, y, w, h) in rect:
+					cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+			# Turn off display if no faces found with a 5 frame requirement
+			if not faces:
+				faceHistory.append("off")
+				if all(face == 'off' for face in faceHistory) and len(faceHistory) == 5:
+					turnoff()
+					faceHistory = []
+			else:
+				faceHistory.append("on")
+				#if all(face == 'on' for face in faceHistory) and len(faceHistory) == 5:
+				turnon()
+				faceHistory = []
+
+			# Display the resulting frame
+			cv2.imshow('frame', frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-
-		# Turn off display if no faces found with a 5 frame requirement
-		if len(faces) == 0:
-			faceHistory.append("off")
-			if all(face == 'off' for face in faceHistory) and len(faceHistory) == 5:
-				turnoff()
-				faceHistory = []
-		else:
-			faceHistory.append("on")
-			#if all(face == 'on' for face in faceHistory) and len(faceHistory) == 5:
-			turnon()
-			faceHistory = []
-
+		counter += 1
 	print("Exited.")

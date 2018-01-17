@@ -3,8 +3,7 @@ import os
 import numpy as np
 import time
 
-
-
+import face_recognition
 '''
 def detect_faces(video_capture, faceCascade):
 	# Capture frame
@@ -105,12 +104,6 @@ def train_save():
 
 	face_recognizer.save('training-data/recognize_model.yml')
 
-#add_face("Sam", 16)
-
-subjects = {1: "Seth", 2: "Sam"}
-
-face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-face_recognizer.read("training-data/recognize_model.yml")
 
 def predict(test_img):
 	img = test_img
@@ -129,19 +122,29 @@ def predict(test_img):
 				cv2.putText(img, label_text, (x, y - 15), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
 	return img
+'''
+if "__main__" == __name__:
+	#add_face("Sam", 16)
 
-video_capture = cv2.VideoCapture(0)
-while True:
+	subjects = {1: "Seth", 2: "Sam"}
 
-		ret, frame = video_capture.read()
-		if frame is not None:
-				recognized_face = predict(frame)
-				# Draw a rectangle around the faces
-				#or (x, y, w, h) in faces:
-				#	cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+	face_recognizer.read("training-data/recognize_model.yml")
 
-				# Display the resulting frame
-				cv2.imshow('Face Recognizer', recognized_face)
 
-				if cv2.waitKey(1) & 0xFF == ord('q'):
-					break
+	video_capture = cv2.VideoCapture(0)
+	while True:
+
+			ret, frame = video_capture.read()
+			if frame is not None:
+					recognized_face = predict(frame)
+					# Draw a rectangle around the faces
+					#or (x, y, w, h) in faces:
+					#	cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+
+					# Display the resulting frame
+					cv2.imshow('Face Recognizer', recognized_face)
+
+					if cv2.waitKey(1) & 0xFF == ord('q'):
+						break
+						'''
