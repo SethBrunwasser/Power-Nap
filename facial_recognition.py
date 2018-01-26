@@ -67,6 +67,8 @@ def prepare_training_data(data_folder_path):
 	faces = []
 	labels = []
 
+	HEIGHT, WIDTH = cv2.imread(data_folder_path + "/Seth/Seth0.jpg").shape[:2]
+	print(HEIGHT, WIDTH)
 	for dir_name in dirs:
 		label = dir_name
 		label_dir_path = data_folder_path + "/" + dir_name
@@ -81,11 +83,14 @@ def prepare_training_data(data_folder_path):
 			if detected_faces is not None:
 				for face in detected_faces:
 					if face is not None:
-						faces.append(face)
+						resized_face = cv2.resize(image, (100, 100), interpolation=cv2.INTER_CUBIC)
+						faces.append(resized_face)
 						if label == "Seth":
 							labels.append(1)
 						if label == "Sam":
 							labels.append(2)
+						if label == "Seth Rogen":
+							labels.append(3)
 
 	cv2.destroyAllWindows()
 	cv2.waitKey(1)
@@ -98,12 +103,11 @@ def train_save():
 	print("Total faces: ", len(faces))
 	print("Total labels: ", len(labels))
 
-	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-
+	#face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+	face_recognizer = cv2.face.FisherFaceRecognizer_create()
 	face_recognizer.train(faces, np.array(labels))
 
-	face_recognizer.save('training-data/recognize_model.yml')
-
+	face_recognizer.save('fisher_recognize_model.yml')
 
 def predict(test_img):
 	img = test_img
@@ -114,7 +118,8 @@ def predict(test_img):
 		
 		for face, rect in zip(faces, rects):
 			if face is not None and rect is not None:
-				label = face_recognizer.predict(face)
+				resized_webcam_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
+				label = face_recognizer.predict(resized_webcam_face)
 				label_text = subjects[label[0]] + " - " + str(round(label[1], 1))
 
 				(x, y, w, h) = rect
@@ -122,14 +127,15 @@ def predict(test_img):
 				cv2.putText(img, label_text, (x, y - 15), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 
 	return img
-'''
+
 if "__main__" == __name__:
+	
 	#add_face("Sam", 16)
 
-	subjects = {1: "Seth", 2: "Sam"}
-
-	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-	face_recognizer.read("training-data/recognize_model.yml")
+	subjects = {1: "Seth", 2: "Sam", 3:"Seth Rogen"}
+	train_save()
+	face_recognizer = cv2.face.FisherFaceRecognizer_create()
+	face_recognizer.read("fisher_recognize_model.yml")
 
 
 	video_capture = cv2.VideoCapture(0)
@@ -147,4 +153,4 @@ if "__main__" == __name__:
 
 					if cv2.waitKey(1) & 0xFF == ord('q'):
 						break
-						'''
+						
