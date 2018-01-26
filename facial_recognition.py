@@ -83,7 +83,8 @@ def prepare_training_data(data_folder_path):
 			if detected_faces is not None:
 				for face in detected_faces:
 					if face is not None:
-						resized_face = cv2.resize(image, (100, 100), interpolation=cv2.INTER_CUBIC)
+
+						resized_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
 						faces.append(resized_face)
 						if label == "Seth":
 							labels.append(1)
@@ -103,11 +104,11 @@ def train_save():
 	print("Total faces: ", len(faces))
 	print("Total labels: ", len(labels))
 
-	#face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-	face_recognizer = cv2.face.FisherFaceRecognizer_create()
+	face_recognizer = cv2.face.LBPHFaceRecognizer_create(threshold=100)
+	#face_recognizer = cv2.face.FisherFaceRecognizer_create()
 	face_recognizer.train(faces, np.array(labels))
 
-	face_recognizer.save('fisher_recognize_model.yml')
+	face_recognizer.save('LBPH_recognize_model.yml')
 
 def predict(test_img):
 	img = test_img
@@ -120,6 +121,7 @@ def predict(test_img):
 			if face is not None and rect is not None:
 				resized_webcam_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
 				label = face_recognizer.predict(resized_webcam_face)
+				print(label)
 				label_text = subjects[label[0]] + " - " + str(round(label[1], 1))
 
 				(x, y, w, h) = rect
@@ -132,10 +134,11 @@ if "__main__" == __name__:
 	
 	#add_face("Sam", 16)
 
-	subjects = {1: "Seth", 2: "Sam", 3:"Seth Rogen"}
+	subjects = {-1: "Unknown", 1: "Seth", 2: "Sam", 3:"Seth Rogen"}
 	train_save()
-	face_recognizer = cv2.face.FisherFaceRecognizer_create()
-	face_recognizer.read("fisher_recognize_model.yml")
+	#face_recognizer = cv2.face.FisherFaceRecognizer_create()
+	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+	face_recognizer.read("LBPH_recognize_model.yml")
 
 
 	video_capture = cv2.VideoCapture(0)
@@ -144,11 +147,7 @@ if "__main__" == __name__:
 			ret, frame = video_capture.read()
 			if frame is not None:
 					recognized_face = predict(frame)
-					# Draw a rectangle around the faces
-					#or (x, y, w, h) in faces:
-					#	cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-					# Display the resulting frame
 					cv2.imshow('Face Recognizer', recognized_face)
 
 					if cv2.waitKey(1) & 0xFF == ord('q'):
