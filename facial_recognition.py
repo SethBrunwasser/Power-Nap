@@ -4,25 +4,12 @@ import numpy as np
 import time
 
 import face_recognition
-'''
-def detect_faces(video_capture, faceCascade):
-	# Capture frame
-	ret, frame = video_capture.read()
 
-	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+from screen import turnoff, turnon
 
-	faces = faceCascade.detectMultiScale(
-		gray,
-		scaleFactor = 1.1,
-		minNeighbors = 5,
-		minSize = (30, 30),
-		flags = cv2.CASCADE_SCALE_IMAGE
-	)
 
-	return faces, ret, frame
-'''
 
-#function to detect face using OpenCV
+#function to detect faces using OpenCV
 def detect_faces(img):
 	#convert the test image to gray scale as opencv face detector expects gray images
 	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -98,7 +85,7 @@ def prepare_training_data(data_folder_path):
 	cv2.destroyAllWindows()
 	return faces, labels
 
-def train_save():
+def train_save(save_as=None):
 	faces, labels = prepare_training_data("training-data")
 
 	print("Total faces: ", len(faces))
@@ -107,16 +94,16 @@ def train_save():
 	face_recognizer = cv2.face.LBPHFaceRecognizer_create(threshold=100)
 	#face_recognizer = cv2.face.FisherFaceRecognizer_create()
 	face_recognizer.train(faces, np.array(labels))
+	if save_as is not None:
+		#face_recognizer.save('LBPH_recognize_model.yml')
+		face_recognizer.save(save_as)
 
-	face_recognizer.save('LBPH_recognize_model.yml')
-
-def predict(test_img):
+def predict(face_recognizer, subjects, test_img):
 	img = test_img
 
 	faces, rects = detect_faces(img)
 
 	if faces is not None and rects is not None:
-		
 		for face, rect in zip(faces, rects):
 			if face is not None and rect is not None:
 				resized_webcam_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
@@ -127,29 +114,6 @@ def predict(test_img):
 				(x, y, w, h) = rect
 				cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 				cv2.putText(img, label_text, (x, y - 15), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
+		return img, label[0]
+	return img, None
 
-	return img
-
-if "__main__" == __name__:
-	
-	#add_face("Sam", 16)
-
-	subjects = {-1: "Unknown", 1: "Seth", 2: "Sam", 3:"Seth Rogen"}
-	train_save()
-	#face_recognizer = cv2.face.FisherFaceRecognizer_create()
-	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-	face_recognizer.read("LBPH_recognize_model.yml")
-
-
-	video_capture = cv2.VideoCapture(0)
-	while True:
-
-			ret, frame = video_capture.read()
-			if frame is not None:
-					recognized_face = predict(frame)
-
-					cv2.imshow('Face Recognizer', recognized_face)
-
-					if cv2.waitKey(1) & 0xFF == ord('q'):
-						break
-						

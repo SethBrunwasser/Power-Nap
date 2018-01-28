@@ -5,50 +5,41 @@
 
 import cv2
 import sys
-from facial_recognition import detect_faces
+from facial_recognition import *
 from screen import turnoff, turnon
 
 if "__main__" == __name__:
-	# Creating face cascade
-	cascPath = "haarcascade_frontalface_default.xml"
-	faceCascade = cv2.CascadeClassifier(cascPath)
 
-	# Set source to default webcam
+	subjects = {-1: "Unknown", 1: "Seth", 2: "Sam", 3:"Seth Rogen"}
+	#train_save()
+	#face_recognizer = cv2.face.FisherFaceRecognizer_create()
+	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
+	face_recognizer.read("LBPH_recognize_model.yml")
 	video_capture = cv2.VideoCapture(0)
 
-	# detected face history
-	faceHistory = []
-
+	label_history = []
 	counter = 0
-	
 	while True:
+		# Only process every other frame to reduce CPU usage
+		if counter % 2 == 0:
+			ret, frame = video_capture.read()
+			if frame is not None:
+					recognized_face, label = predict(face_recognizer, subjects, frame)
+					cv2.imshow('Face Recognizer', recognized_face)
+					
+					# If face is unknown, turn off display
+					if label:
+						if label == -1:
 
-		ret, frame = video_capture.read()
-		# Only look at every third frame
-		if counter % 3 == 0:
+							# Uses 5 frame buffer to have smoother transitions between on/off display
+							label_history.append(label)
+							if len(label_history) == 20 and all(label == -1 for label in label_history):
+								turnoff()
+								label_history = []
+						else:
+							turnon()
 
-			faces, rect = detect_faces(frame)
-
-			# Draw a rectangle around the faces
-			if faces is not None:
-				for (x, y, w, h) in rect:
-					cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-
-			# Turn off display if no faces found with a 5 frame requirement
-			if not faces:
-				faceHistory.append("off")
-				if all(face == 'off' for face in faceHistory) and len(faceHistory) == 5:
-					turnoff()
-					faceHistory = []
-			else:
-				faceHistory.append("on")
-				#if all(face == 'on' for face in faceHistory) and len(faceHistory) == 5:
-				turnon()
-				faceHistory = []
-
-			# Display the resulting frame
-			cv2.imshow('frame', frame)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			break
+					if cv2.waitKey(1) & 0xFF == ord('q'):
+						break
 		counter += 1
 	print("Exited.")
