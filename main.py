@@ -7,6 +7,7 @@ import cv2
 import sys
 from facial_recognition import *
 from screen import turnoff, turnon
+from database import UsersDB
 
 if "__main__" == __name__:
 
@@ -17,6 +18,14 @@ if "__main__" == __name__:
 	face_recognizer.read("LBPH_recognize_model.yml")
 	video_capture = cv2.VideoCapture(0)
 
+	training_data_path = "training-data/"
+
+	db = UsersDB()
+	db.new_user("Sam", "Y", training_data_path+"Sam/")
+	db.new_user("Seth", "Y", training_data_path+"Seth/")
+	db.new_user("Seth Rogen", "Y", training_data_path+"Seth Rogen/")
+	print(db.query_all())
+	
 	label_history = []
 	counter = 0
 	while True:
@@ -30,7 +39,6 @@ if "__main__" == __name__:
 					# If face is unknown, turn off display
 					if label:
 						if label == -1:
-
 							# Uses 5 frame buffer to have smoother transitions between on/off display
 							label_history.append(label)
 							if len(label_history) == 20 and all(label == -1 for label in label_history):

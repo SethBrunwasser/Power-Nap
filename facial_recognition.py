@@ -13,8 +13,9 @@ from screen import turnoff, turnon
 def detect_faces(img):
 	#convert the test image to gray scale as opencv face detector expects gray images
 	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	 
-	#load OpenCV face detector, I am using LBP which is fast
+	gray = cv2.equalizeHist(gray)
+	
+	#load OpenCV face detector, I am using LBPH which is fast
 	#there is also a more accurate but slow: Haar classifier
 	cascPath = "haarcascade_frontalface_alt2.xml"
 	
@@ -108,7 +109,7 @@ def predict(face_recognizer, subjects, test_img):
 			if face is not None and rect is not None:
 				resized_webcam_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
 				label = face_recognizer.predict(resized_webcam_face)
-				print(label)
+
 				label_text = subjects[label[0]] + " - " + str(round(label[1], 1))
 
 				(x, y, w, h) = rect

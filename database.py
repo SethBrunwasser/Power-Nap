@@ -1,38 +1,37 @@
-import MySQLdb
+
+import sqlite3
+import sys
 
 class UsersDB:
-	host = 'localhost'
-	user = 'root'
-	password = '123'
-	db = 'Users'
 
 	def __init__(self):
-		self.connection = MySQLdb.connect(self.host, self.user, self.password, self.db)
+		self.connection = sqlite3.connect('users.db')
 		self.cursor = self.connection.cursor()
 
-		try:
-			self.cursor.execute("""
-				CREATE TABLE PERSON (
-				USER_ID INT,
-				NAME CHAR(20) NOT NULL,
-				AUTHORIZATION CHAR(1),
-				IMAGE_PATH CHAR(20) )
-				""")
-			self.connection.commit()
-		except:
-			self.connection.rollback()
+		self.cursor.execute("DROP TABLE IF EXISTS PERSON")
+		self.cursor.execute("""
+			CREATE TABLE PERSON(
+			USER_ID INTEGER PRIMARY KEY autoincrement,
+			NAME TEXT NOT NULL,
+			AUTHORIZATION TEXT,
+			IMAGE_PATH TEXT
+			);""")
+		self.connection.commit()
 
-	def insert(self, query):
-		try:
-			self.cursor.execute(query)
-			self.connection.commit()
-		except:
-			self.connection.rollback()
-
+	def new_user(self, name, authorization, path):
+	
+		self.cursor.execute("INSERT INTO PERSON (NAME, AUTHORIZATION, IMAGE_PATH) VALUES (?, ?, ?)", 
+			(name, authorization, path))
+	
 	def query(self, query):
-		cursor = self.connection.cursor(MySQLdb.cursors.DictCursor)
-		cursor.execute(query)
-		return cursor.fetchall()
+		self.cursor.execute(query)
+		return self.cursor.fetchall()
 
-	def __del__(self):
-		self.connection.close()
+	def query_all(self):
+		data = self.cursor.execute("SELECT * FROM PERSON;")
+		for row in data:
+			print(row)
+		return self.cursor.fetchall()
+
+#	def __del__(self):
+#		self.connection.close()
