@@ -11,21 +11,24 @@ from database import UsersDB
 
 if "__main__" == __name__:
 
-	subjects = {-1: "Unknown", 1: "Seth", 2: "Sam", 3:"Seth Rogen"}
-	#train_save()
-	#face_recognizer = cv2.face.FisherFaceRecognizer_create()
+
+	db = UsersDB()
+	training_data_path = "training-data/"
+	db.new_user("Seth", "Y", training_data_path+"Seth/")
+	db.new_user("Sam", "Y", training_data_path+"Sam/")
+	db.new_user("Seth Rogen", "Y", training_data_path+"Seth Rogen/")
+	print(db.query_all())
+	
+
+	subjects = db.query_subjects()
+	subjects = dict(subjects)
+	print(subjects)
+	#train_save(db)
 	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
 	face_recognizer.read("LBPH_recognize_model.yml")
 	video_capture = cv2.VideoCapture(0)
 
-	training_data_path = "training-data/"
 
-	db = UsersDB()
-	db.new_user("Sam", "Y", training_data_path+"Sam/")
-	db.new_user("Seth", "Y", training_data_path+"Seth/")
-	db.new_user("Seth Rogen", "Y", training_data_path+"Seth Rogen/")
-	print(db.query_all())
-	
 	label_history = []
 	counter = 0
 	while True:

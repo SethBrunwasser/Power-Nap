@@ -18,6 +18,9 @@ class UsersDB:
 			);""")
 		self.connection.commit()
 
+		# Unknown user
+		self.cursor.execute("INSERT INTO PERSON (USER_ID, NAME, AUTHORIZATION) VALUES (-1, 'Unknown', 'N')")
+
 	def new_user(self, name, authorization, path):
 	
 		self.cursor.execute("INSERT INTO PERSON (NAME, AUTHORIZATION, IMAGE_PATH) VALUES (?, ?, ?)", 
@@ -31,6 +34,14 @@ class UsersDB:
 		data = self.cursor.execute("SELECT * FROM PERSON;")
 		for row in data:
 			print(row)
+		return self.cursor.fetchall()
+
+	def query_id(self, name):
+		name = self.cursor.execute("SELECT USER_ID FROM PERSON WHERE NAME=?", (name,))
+		return self.cursor.fetchall()
+
+	def query_subjects(self):
+		subjects = self.cursor.execute("SELECT USER_ID, NAME FROM PERSON;")
 		return self.cursor.fetchall()
 
 #	def __del__(self):

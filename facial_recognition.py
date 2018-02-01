@@ -3,10 +3,10 @@ import os
 import numpy as np
 import time
 
-import face_recognition
 
 from screen import turnoff, turnon
 
+import database
 
 
 #function to detect faces using OpenCV
@@ -49,14 +49,15 @@ def add_face(label, numOfImages):
 		cv2.imwrite("training-data/{}/{}{}.jpg".format(label, label, i), img)
 		time.sleep(1)
 
-def prepare_training_data(data_folder_path):
+def prepare_training_data(data_folder_path, db):
 	dirs = os.listdir(data_folder_path)
 
 	faces = []
 	labels = []
 
 	HEIGHT, WIDTH = cv2.imread(data_folder_path + "/Seth/Seth0.jpg").shape[:2]
-	print(HEIGHT, WIDTH)
+	print("Height: {} Width: {}".format(HEIGHT, WIDTH))
+
 	for dir_name in dirs:
 		label = dir_name
 		label_dir_path = data_folder_path + "/" + dir_name
@@ -74,20 +75,17 @@ def prepare_training_data(data_folder_path):
 
 						resized_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
 						faces.append(resized_face)
-						if label == "Seth":
-							labels.append(1)
-						if label == "Sam":
-							labels.append(2)
-						if label == "Seth Rogen":
-							labels.append(3)
+						user_id = db.query_id(label)
+						print(user_id)
+						labels.append(user_id)
 
 	cv2.destroyAllWindows()
 	cv2.waitKey(1)
 	cv2.destroyAllWindows()
 	return faces, labels
 
-def train_save(save_as=None):
-	faces, labels = prepare_training_data("training-data")
+def train_save(db, save_as=None):
+	faces, labels = prepare_training_data("training-data", db)
 
 	print("Total faces: ", len(faces))
 	print("Total labels: ", len(labels))
