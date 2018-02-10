@@ -103,16 +103,32 @@ def predict(face_recognizer, subjects, test_img):
 	faces, rects = detect_faces(img)
 
 	if faces is not None and rects is not None:
+		temp_labels = []
+		temp_faces = []
 		for face, rect in zip(faces, rects):
 			if face is not None and rect is not None:
 				resized_webcam_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
 				label = face_recognizer.predict(resized_webcam_face)
+				temp_labels.append(label[0])
+				temp_faces.append(face)
 
 				label_text = subjects[label[0]] + " - " + str(round(label[1], 1))
 
 				(x, y, w, h) = rect
 				cv2.rectangle(img, (x, y), (x+w, y+h), (0, 255, 0), 2)
 				cv2.putText(img, label_text, (x, y - 15), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
-		return img, label[0]
-	return img, None
+		return img, temp_labels, temp_faces
+	return img, None, None
+'''
+def update(labels, faces):
+	detected_faces, rect = detect_faces(image)
+			if detected_faces is not None:
+				for face in detected_faces:
+					if face is not None:
 
+						resized_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
+						faces.append(resized_face)
+						user_id = db.query_id(label)
+						print(user_id)
+						labels.append(user_id)
+						'''
