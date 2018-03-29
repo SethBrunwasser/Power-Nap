@@ -38,14 +38,13 @@ if "__main__" == __name__:
 			if frame is not None:
 					recognized_face, labels, faces = predict(face_recognizer, subjects, frame)
 					print(labels)
-					print(faces)
+					print(counter)
 					cv2.imshow('Face Recognizer', recognized_face)
 					
-					#if labels:
-
+					if labels and -1 not in labels:
 						# Update face data every 300 frames
-						#if counter % 300 == 0 and len(labels) == 1 and labels[0] != -1:
-						#	update(labels, faces)
+						if counter % 25 == 0 and len(labels) == 1:
+							update(face_recognizer, faces, labels)
 
 					# If face is unknown or no faces detected, turn off display
 					if labels is None or -1 in labels:

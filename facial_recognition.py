@@ -119,16 +119,7 @@ def predict(face_recognizer, subjects, test_img):
 				cv2.putText(img, label_text, (x, y - 15), cv2.FONT_HERSHEY_TRIPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA)
 		return img, temp_labels, temp_faces
 	return img, None, None
-'''
-def update(labels, faces):
-	detected_faces, rect = detect_faces(image)
-			if detected_faces is not None:
-				for face in detected_faces:
-					if face is not None:
 
-						resized_face = cv2.resize(face, (100, 100), interpolation=cv2.INTER_CUBIC)
-						faces.append(resized_face)
-						user_id = db.query_id(label)
-						print(user_id)
-						labels.append(user_id)
-						'''
+def update(facerecognizer, faces, labels):
+	facerecognizer.update(faces, np.array(labels))
+	facerecognizer.save("LBPH_recognize_model.yml")
