@@ -5,7 +5,7 @@
 
 import cv2
 import sys
-from facial_recognition import *
+from recognizer import Recognizer
 from screen import turnoff, turnon
 from database import UsersDB
 
@@ -24,8 +24,7 @@ if "__main__" == __name__:
 	subjects = dict(subjects)
 	print(subjects)
 	#train_save(db)
-	face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-	face_recognizer.read("LBPH_recognize_model.yml")
+	recognizer = Recognizer()
 	video_capture = cv2.VideoCapture(0)
 
 
@@ -36,7 +35,7 @@ if "__main__" == __name__:
 		if counter % 2 == 0:
 			ret, frame = video_capture.read()
 			if frame is not None:
-					recognized_face, labels, faces = predict(face_recognizer, subjects, frame)
+					recognized_face, labels, faces = recognizer.predict(subjects, frame)
 					print(labels)
 					print(counter)
 					cv2.imshow('Face Recognizer', recognized_face)
@@ -44,7 +43,7 @@ if "__main__" == __name__:
 					if labels and -1 not in labels:
 						# Update face data every 300 frames
 						if counter % 25 == 0 and len(labels) == 1:
-							update(face_recognizer, faces, labels)
+							recognizer.update(faces, labels)
 
 					# If face is unknown or no faces detected, turn off display
 					if labels is None or -1 in labels:
