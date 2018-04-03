@@ -5,11 +5,11 @@ import time
 
 class Recognizer(object):
 	"""docstring for Recognizer"""
-	def __init__(self, load=False):
+	def __init__(self, load=True):
 		super(Recognizer, self).__init__()
 
 		self.face_recognizer = cv2.face.LBPHFaceRecognizer_create()
-		if not load:
+		if load:
 			self.face_recognizer.read("LBPH_recognize_model.yml")
 
 		self.training_data_path = "training-data/"
