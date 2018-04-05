@@ -16,37 +16,42 @@ class Viewer(object):
 		self.counter = 0
 		self.labels = []
 
+
+		# Status variables
+		self.currentFrame = None
 		self.isRunning = False
+		self.screen = True
+		self.unauthorizedDetected = False
 
 
 	def processFrames(self):
-		self.isRunning = True
 		while True:
 				# Only process every other frame to reduce CPU usage
 				if self.counter % 2 == 0:
 					ret, frame = self.video_capture.read()
 					if frame is not None:
-							recognized_face, labels, faces = self.recognizer.predict(self.subjects, frame)
-							print(labels)
-							print(self.counter)
-							
+							recognized_face, self.labels, faces = self.recognizer.predict(self.subjects, frame)
+							self.currentFrame = frame
+
 							cv2.imshow('Face Recognizer', recognized_face)
 
-							if labels and -1 not in labels:
-								# Update face data every 300 frames
-								if self.counter % 25 == 0 and len(labels) == 1:
-									self.recognizer.update(faces, labels)
-
 							# If face is unknown or no faces detected, turn off display
-							if labels is None or -1 in labels:
+							if self.labels is None or -1 in self.labels:
 								# Uses 5 frame buffer to have smoother transitions between on/off display
 								self.label_history.append(-1)
 								if len(self.label_history) == 10 and all(label == -1 for label in self.label_history):
 									turnoff()
+									self.screen = False
 									self.label_history = []
+									self.unauthorizedDetected = True
 							else:
 								turnon()
+								self.screen = True
 								self.label_history = []
+								self.unauthorizedDetected = False
+								# Update face data every 300 frames
+								if self.counter % 25 == 0 and len(self.labels) == 1:
+									self.recognizer.update(faces, self.labels)
 
 							if cv2.waitKey(1) & 0xFF == ord('q'):
 								break
@@ -58,7 +63,4 @@ class Viewer(object):
 		''' Threading to allow for frame processing in parallel with other functions '''
 		t = threading.Thread(target=self.processFrames)
 		t.start()
-
-
-	def isRunning(self):
-		return self.isRunning
+		self.isRunning = True

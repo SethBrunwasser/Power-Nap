@@ -10,6 +10,8 @@ from screen import turnoff, turnon
 from viewer import Viewer
 from database import UsersDB
 
+import time
+
 if "__main__" == __name__:
 
 
@@ -28,6 +30,6 @@ if "__main__" == __name__:
 	recognizer = Recognizer()
 	viewer = Viewer(recognizer, subjects)
 	viewer.run()
-
-	print("\n\n\n\n")
-	print("Processed while running")
+	while viewer.isRunning:
+		if viewer.unauthorizedDetected:
+			print(viewer.currentFrame)
