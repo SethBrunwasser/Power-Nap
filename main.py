@@ -24,8 +24,10 @@ if "__main__" == __name__:
 	subjects = db.query_subjects()
 	subjects = dict(subjects)
 	print(subjects)
-	#train_save(db)
+
 	recognizer = Recognizer()
-	video_capture = cv2.VideoCapture(0)
 	viewer = Viewer(recognizer, subjects)
 	viewer.run()
+
+	print("\n\n\n\n")
+	print("Processed while running")
