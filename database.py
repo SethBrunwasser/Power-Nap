@@ -5,7 +5,7 @@ import sys
 class UsersDB:
 
 	def __init__(self):
-		self.connection = sqlite3.connect('users.db')
+		self.connection = sqlite3.connect('users.db', timeout=10)
 		self.cursor = self.connection.cursor()
 
 		self.cursor.execute("DROP TABLE IF EXISTS PERSON")
@@ -22,7 +22,6 @@ class UsersDB:
 		self.cursor.execute("INSERT INTO PERSON (USER_ID, NAME, AUTHORIZATION) VALUES (-1, 'Unknown', 'N')")
 
 	def new_user(self, name, authorization, path):
-	
 		self.cursor.execute("INSERT INTO PERSON (NAME, AUTHORIZATION, IMAGE_PATH) VALUES (?, ?, ?)", 
 			(name, authorization, path))
 	
@@ -44,5 +43,5 @@ class UsersDB:
 		subjects = self.cursor.execute("SELECT USER_ID, NAME FROM PERSON;")
 		return self.cursor.fetchall()
 
-#	def __del__(self):
-#		self.connection.close()
+	def __del__(self):
+		self.connection.close()
