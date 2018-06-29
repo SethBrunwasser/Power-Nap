@@ -36,6 +36,7 @@ def stream():
 	frame = None
 	global_frame = None
 	prev = None
+	screen = True
 	counter = 0
 	from viewer import processFrame as pf
 	print("streaming")

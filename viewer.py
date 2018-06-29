@@ -12,7 +12,7 @@ video_capture = cv2.VideoCapture(0)
 label_history = []
 #counter = 0
 labels = []
-
+screen = True
 
 # Status variables
 daemon = False
@@ -27,6 +27,7 @@ def processFrame(recognizer, counter, subjects):
   # Only process every other frame to reduce CPU usage
   global label_history
   global labels
+  global screen
   if counter % 2 == 0:
     ret, frame = video_capture.read()
     if frame is not None:
